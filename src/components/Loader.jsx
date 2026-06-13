@@ -27,16 +27,16 @@ export default function Loader({ onComplete }) {
   }, [onComplete]);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ scale: 1, opacity: 1 }}
-      animate={{ 
+      animate={{
         scale: progress === 100 ? 50 : 1, // Massive Zoom-in at 100%
-        opacity: progress === 100 ? 0 : 1 
+        opacity: progress === 100 ? 0 : 1
       }}
       transition={{ duration: 1.2, ease: 'easeInOut' }}
       style={{
         position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-        background: '#020202', zIndex: 9999, display: 'flex', 
+        background: '#020202', zIndex: 9999, display: 'flex',
         flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
       }}
     >

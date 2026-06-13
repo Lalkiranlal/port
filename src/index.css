@@ -7,7 +7,7 @@
   --color-text-bright: #e2f1ff;
   --color-sys-blue: #00e5ff;
   --color-sys-purple: #8a2be2;
-  --color-mural-red: #ff3366;
+  --color-abyss-purple: #7a63ff;
   
   /* Mapped for backward compatibility */
   --color-sunfire-orange: var(--color-sys-blue);
@@ -187,13 +187,13 @@ section {
 
 .deity-sub {
   font-family: var(--font-heading);
-  color: var(--color-mural-red);
+  color: var(--color-abyss-purple);
   font-size: 1.5rem;
   margin-bottom: 2rem;
   display: inline-block;
   letter-spacing: 3px;
   text-transform: uppercase;
-  border-bottom: 2px solid var(--color-mural-red);
+  border-bottom: 2px solid var(--color-abyss-purple);
   padding-bottom: 5px;
 }
 
@@ -355,7 +355,7 @@ section {
 .system-subtitle {
   font-family: monospace;
   font-size: 1rem;
-  color: var(--color-mural-red);
+  color: var(--color-abyss-purple);
   margin-bottom: 1rem;
   text-transform: uppercase;
   letter-spacing: 1px;

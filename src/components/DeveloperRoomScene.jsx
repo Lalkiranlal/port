@@ -37,7 +37,7 @@ const DecodeText = ({ text, className, delay = 0 }) => {
   };
 
   return (
-    <motion.span 
+    <motion.span
       className={className}
       onViewportEnter={() => setTimeout(startDecode, delay)}
       viewport={{ once: true, amount: 0.8 }}
@@ -52,10 +52,10 @@ const ConstellationTimeline = ({ nodes, pathData, starCoords, height = '400px' }
   return (
     <div style={{ position: 'relative', width: '100%', height: height, marginTop: '2rem' }}>
       <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', overflow: 'visible', zIndex: -1 }}>
-        <motion.path 
-          d={pathData} 
-          stroke="var(--color-sys-blue)" 
-          strokeWidth="0.5" 
+        <motion.path
+          d={pathData}
+          stroke="var(--color-sys-blue)"
+          strokeWidth="0.5"
           fill="transparent"
           initial={{ pathLength: 0 }}
           whileInView={{ pathLength: 1 }}
@@ -65,42 +65,42 @@ const ConstellationTimeline = ({ nodes, pathData, starCoords, height = '400px' }
 
       </svg>
       {nodes.map((node, i) => (
-        <motion.div key={`text-${i}`} 
-          initial={{ opacity: 0, x: -10 }} 
-          whileInView={{ opacity: 1, x: 0 }} 
+        <motion.div key={`text-${i}`}
+          initial={{ opacity: 0, x: -10 }}
+          whileInView={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5 + i * 0.4 }}
-          style={{ 
-            position: 'absolute', 
-            left: `${starCoords[i].x}%`, 
-            top: `${starCoords[i].y}%`, 
-            color: '#fff', 
-            textShadow: '0 5px 10px rgba(0,0,0,1), 0 0 15px rgba(0,0,0,0.8)', 
+          style={{
+            position: 'absolute',
+            left: `${starCoords[i].x}%`,
+            top: `${starCoords[i].y}%`,
+            color: '#fff',
+            textShadow: '0 5px 10px rgba(0,0,0,1), 0 0 15px rgba(0,0,0,0.8)',
             minWidth: '280px',
             pointerEvents: 'auto',
             transform: 'translate(-10px, -10px)', /* Center the star on the line */
             zIndex: 20
           }}
         >
-           {/* The Star Shape */}
-           <div style={{ 
-             width: '20px', height: '20px', 
-             background: '#00f0ff',
-             clipPath: 'polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%)',
-             boxShadow: '0 0 20px #00f0ff',
-             position: 'absolute',
-             top: '0', left: '0',
-             zIndex: 20
-           }} />
-           
-           <div style={{ paddingLeft: '35px' }}>
-             <strong style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
-             <DecodeText text={node.label} />
-           </strong>
-           <br/>
-           <span style={{ color: '#00f0ff', fontSize: '1.05rem', fontFamily: 'monospace', whiteSpace: 'pre-wrap', textShadow: '0 2px 4px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8)' }}>
-             <DecodeText text={node.sub} delay={200} />
-           </span>
-           </div>
+          {/* The Star Shape */}
+          <div style={{
+            width: '20px', height: '20px',
+            background: '#00f0ff',
+            clipPath: 'polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%)',
+            boxShadow: '0 0 20px #00f0ff',
+            position: 'absolute',
+            top: '0', left: '0',
+            zIndex: 20
+          }} />
+
+          <div style={{ paddingLeft: '35px' }}>
+            <strong style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
+              <DecodeText text={node.label} />
+            </strong>
+            <br />
+            <span style={{ color: '#00f0ff', fontSize: '1.05rem', fontFamily: 'monospace', whiteSpace: 'pre-wrap', textShadow: '0 2px 4px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8)' }}>
+              <DecodeText text={node.sub} delay={200} />
+            </span>
+          </div>
         </motion.div>
       ))}
     </div>
@@ -215,7 +215,7 @@ function CameraController() {
   useFrame((state) => {
     const offset = scroll.offset;
     const targetLookAt = new THREE.Vector3();
-    
+
     // Exact mapping of pause phases and transitions
     // Intro
     if (offset < 0.10) {
@@ -375,7 +375,7 @@ function Overlays() {
       {/* 2. Projects (Right) */}
       <motion.div className="system-section" style={getContainerStyle(1)} variants={variantsRight} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }}>
         <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Active Quests" /></motion.h1>
-        
+
         <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
           <h2 className="system-title"><DecodeText text="Rapidor Enterprise Sales Platform" delay={100} /></h2>
           <div className="system-subtitle"><DecodeText text="B2B Commerce & SFA" delay={200} /></div>
@@ -437,7 +437,7 @@ function Overlays() {
       {/* 4. Education (Left) */}
       <motion.div className="system-section" style={getContainerStyle(3)} variants={variantsLeft} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
         <motion.h1 className="system-header" variants={itemVariants}><DecodeText text="Origins" /></motion.h1>
-        <ConstellationTimeline 
+        <ConstellationTimeline
           nodes={[
             { label: "10th Standard", sub: "VMHSS School, Palakkad" },
             { label: "Higher Secondary", sub: "GBHSS, Palakkad" },
@@ -445,7 +445,7 @@ function Overlays() {
             { label: "Master's in Mobile Dev", sub: "CUSAT | 2022-2024" }
           ]}
           pathData="M 30 10 L 10 40 L 50 65 L 70 95"
-          starCoords={[{x: 30, y: 10}, {x: 10, y: 40}, {x: 50, y: 65}, {x: 70, y: 95}]}
+          starCoords={[{ x: 30, y: 10 }, { x: 10, y: 40 }, { x: 50, y: 65 }, { x: 70, y: 95 }]}
           height="600px"
         />
       </motion.div>
@@ -453,13 +453,13 @@ function Overlays() {
       {/* 5. Experience (Right) */}
       <motion.div className="system-section" style={getContainerStyle(4)} variants={variantsRight} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
         <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Combat Log" /></motion.h1>
-        <ConstellationTimeline 
+        <ConstellationTimeline
           nodes={[
             { label: "Junior Software Engineer", sub: "AcelrTech (Rapidor) | May 2024 – Present\nDevelop enterprise mobile applications using Flutter for B2B commerce and sales automation platforms.\nIntegrated REST APIs and Firebase services for authentication, notifications, and data synchronization.\nImplemented offline data caching and background synchronization for field sales usage." },
             { label: "Software Developer Intern", sub: "AcelrTech | Mar 2024 – May 2024\nContributed to production Flutter applications used by enterprise sales teams.\nResolved 200+ issues related to UI rendering, API integration, and mobile builds." }
           ]}
           pathData="M 80 20 L 20 80"
-          starCoords={[{x: 80, y: 20}, {x: 20, y: 80}]}
+          starCoords={[{ x: 80, y: 20 }, { x: 20, y: 80 }]}
           height="500px"
         />
       </motion.div>

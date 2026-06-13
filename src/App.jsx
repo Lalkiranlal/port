@@ -56,11 +56,11 @@ function VerticalNavigation() {
         alignItems: 'flex-start',
         gap: '20px',
         padding: '20px 10px',
-        border: '1px solid rgba(0, 240, 255, 0.3)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         borderRadius: '50px',
-        background: 'rgba(3, 8, 20, 0.6)',
-        backdropFilter: 'blur(5px)',
-        boxShadow: 'inset 0 0 10px rgba(0, 240, 255, 0.1)',
+        background: 'rgba(255, 255, 255, 0.03)',
+        backdropFilter: 'blur(16px)',
+        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
         cursor: 'pointer'
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -77,8 +77,8 @@ function VerticalNavigation() {
           width: '20px',
           height: '20px',
           borderRadius: '50%',
-          background: '#00f0ff',
-          boxShadow: '0 0 15px #00f0ff, 0 0 30px #00f0ff',
+          background: 'rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)',
           pointerEvents: 'none'
         }}
       />
@@ -101,7 +101,7 @@ function VerticalNavigation() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: activeIndex === idx ? '#030613' : 'rgba(0, 240, 255, 0.6)',
+            color: activeIndex === idx ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
             zIndex: 10,
             transition: 'color 0.3s ease'
           }}>
@@ -120,12 +120,12 @@ function VerticalNavigation() {
                   position: 'absolute',
                   left: '35px',
                   whiteSpace: 'nowrap',
-                  color: activeIndex === idx ? '#fff' : '#00f0ff',
+                  color: '#ffffff',
                   fontFamily: 'var(--font-heading)',
                   textTransform: 'uppercase',
                   letterSpacing: '2px',
                   fontSize: '0.9rem',
-                  textShadow: activeIndex === idx ? '0 0 10px #00f0ff' : 'none'
+                  textShadow: activeIndex === idx ? '0 0 10px rgba(255,255,255,0.5)' : 'none'
                 }}
               >
                 {sec.label}
