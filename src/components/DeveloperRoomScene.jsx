@@ -32,7 +32,9 @@ const DecodeText = ({ text, className, delay = 0 }) => {
         }).join('')
       );
       if (iterations >= text.length) clearInterval(interval);
-      iterations += 1 / 3; // speed of decode
+      
+      // Speed up decode dramatically for long texts (max ~15 frames to decode completely)
+      iterations += Math.max(1, text.length / 15);
     }, 30);
   };
 
@@ -118,65 +120,85 @@ function StorybookDiorama() {
     tex.magFilter = THREE.LinearFilter;
   });
 
+  const scroll = useScroll();
+  const [fgSeed, setFgSeed] = React.useState(0);
+  const fgShuffled = React.useRef(false);
+
+  // Invisibly shuffle foreground layers ONLY when they are completely behind the camera
+  useFrame(() => {
+    const o = scroll.offset;
+    
+    // Camera is deep in the scene (Z is negative). Foreground layers are behind us.
+    if (o > 0.6 && !fgShuffled.current) {
+      setFgSeed(Math.random());
+      fgShuffled.current = true;
+    } else if (o < 0.4 && fgShuffled.current) {
+      fgShuffled.current = false;
+    }
+  });
+
+  // Calculate shuffled X offsets based on seeds
+  const fgOffset = fgSeed * 40 - 20; // Random X shift for foreground
+
   return (
     <group>
-      {/* L0: Background Wall (Z=-100). Scaled down slightly for better resolution. */}
+      {/* L0: Background Wall (Z=-100). Scaled massively to prevent visible edges at extreme angles. */}
       <mesh position={[0, 0, -100]}>
-        <planeGeometry args={[300, 168]} />
+        <planeGeometry args={[900, 504]} />
         <meshBasicMaterial map={bgTex} depthWrite={false} />
       </mesh>
 
       {/* L1: Secondary Mist / Background Overlay (Z=-80) */}
       <mesh position={[0, -20, -80]}>
-        <planeGeometry args={[200, 150]} />
+        <planeGeometry args={[600, 450]} />
         <meshBasicMaterial map={partTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.6} />
       </mesh>
 
       {/* L2: Distant Left Pillar (Z=-70) */}
       <mesh position={[-40, -10, -70]}>
-        <planeGeometry args={[80, 80]} />
+        <planeGeometry args={[100, 100]} />
         <meshBasicMaterial map={shelfTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
       </mesh>
 
       {/* L3: Experience Tree / Main Statue (Z=-60). Offset Right. */}
       <mesh position={[25, 0, -60]}>
-        <planeGeometry args={[100, 100]} />
+        <planeGeometry args={[120, 120]} />
         <meshBasicMaterial map={treeTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
       </mesh>
 
       {/* L4: Distant Magic Runes (Z=-50). Offset Left. */}
       <mesh position={[-30, 20, -50]}>
-        <planeGeometry args={[80, 80]} />
+        <planeGeometry args={[100, 100]} />
         <meshBasicMaterial map={holoTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.5} />
       </mesh>
 
       {/* L5: About Me Pillar (Z=-40). Offset Left. */}
       <mesh position={[-25, 0, -40]}>
-        <planeGeometry args={[100, 100]} />
+        <planeGeometry args={[120, 120]} />
         <meshBasicMaterial map={shelfTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
       </mesh>
 
       {/* L6: Ground Aura Extradition (Z=-30) */}
       <mesh position={[0, -20, -30]}>
-        <planeGeometry args={[150, 150]} />
+        <planeGeometry args={[200, 200]} />
         <meshBasicMaterial map={deskTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.7} />
       </mesh>
 
       {/* L7: Skills Hologram (Z=-20). Offset Right. */}
-      <mesh position={[25, 5, -20]}>
-        <planeGeometry args={[100, 100]} />
+      <mesh position={[25 + fgOffset, 5, -20]}>
+        <planeGeometry args={[120, 120]} />
         <meshBasicMaterial map={holoTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
       </mesh>
 
       {/* L8: Right Foreground Statue (Z=-10). Offset Right */}
-      <mesh position={[40, -15, -10]}>
-        <planeGeometry args={[80, 80]} />
+      <mesh position={[40 - fgOffset, -15, -10]}>
+        <planeGeometry args={[100, 100]} />
         <meshBasicMaterial map={treeTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
       </mesh>
 
       {/* L9: Intro Desk / Ground Source (Z=0). Center. */}
-      <mesh position={[0, -10, 0]}>
-        <planeGeometry args={[80, 80]} />
+      <mesh position={[0 + fgOffset * 0.5, -10, 0]}>
+        <planeGeometry args={[100, 100]} />
         <meshBasicMaterial map={deskTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
       </mesh>
 
@@ -195,22 +217,33 @@ function CameraController() {
   const vec = new THREE.Vector3();
   const currentLookAt = new THREE.Vector3(0, 0, -80);
 
-  // The 6 Anchor Positions for the Camera Flight Path
-  const pStart = new THREE.Vector3(0, 0, 40);
-  const pIntro = new THREE.Vector3(0, 5, 20);
-  const pProjects = new THREE.Vector3(5, 2, 5);
-  const pSkills = new THREE.Vector3(5, 2, -10);
-  const pAbout = new THREE.Vector3(0, 2, -25);
-  const pExperience = new THREE.Vector3(5, 2, -45);
-  const pContact = new THREE.Vector3(0, 2, -60);
+  // Procedurally generate highly dramatic cinematic flight paths
+  const { 
+    pIntro, pProjects, pSkills, pAbout, pExperience, pContact,
+    tIntro, tProjects, tSkills, tAbout, tExperience, tContact 
+  } = React.useMemo(() => {
+    // Helper to generate a random number within a range
+    const r = (min, max) => Math.random() * (max - min) + min;
 
-  // Define HTML node positions (what the camera looks at)
-  const tIntro = new THREE.Vector3(-5, 0, 0);
-  const tProjects = new THREE.Vector3(15, -2, -10);
-  const tSkills = new THREE.Vector3(20, 0, -25);
-  const tAbout = new THREE.Vector3(-15, 0, -35); // Brought closer (was -20, 0, -40)
-  const tExperience = new THREE.Vector3(15, 0, -55); // Brought closer (was 20, 0, -60)
-  const tContact = new THREE.Vector3(0, 0, -80);
+    return {
+      // Camera Positions (P) - Gentle sweeps to preserve 2D diorama illusion
+      // Lock Z to safe midpoints between planes to prevent clipping/blurry textures
+      pIntro: new THREE.Vector3(r(-5, 5), r(0, 5), 45), 
+      pProjects: new THREE.Vector3(r(10, 20), r(-5, 5), 10), 
+      pSkills: new THREE.Vector3(r(-20, -10), r(5, 10), -5), 
+      pAbout: new THREE.Vector3(r(-5, 5), r(-10, -5), -25), 
+      pExperience: new THREE.Vector3(r(10, 20), r(10, 15), -45), 
+      pContact: new THREE.Vector3(r(-5, 5), r(10, 15), 65), 
+
+      // Camera Look-At Targets (T) - Subtle angle variations
+      tIntro: new THREE.Vector3(0, 0, -10),
+      tProjects: new THREE.Vector3(r(-5, 0), r(0, 5), -15),
+      tSkills: new THREE.Vector3(r(0, 5), r(-5, 0), -25),
+      tAbout: new THREE.Vector3(0, r(5, 10), -45),
+      tExperience: new THREE.Vector3(r(-10, 0), r(-10, -5), -60),
+      tContact: new THREE.Vector3(0, 0, -30)
+    };
+  }, []);
 
   useFrame((state) => {
     const offset = scroll.offset;
@@ -309,14 +342,20 @@ function NavListener() {
 
   return null;
 }
-function Overlays() {
+function Overlays({ isMobile }) {
   const sections = [
-    { offset: 0.0, top: '50vh', width: '700px', left: '10%', right: 'auto', align: 'left', transform: 'translateY(-50%)' }, // Intro: Left
-    { offset: 0.25, top: '325vh', width: '700px', left: 'auto', right: '10%', align: 'right', transform: 'translateY(-50%)' }, // Projects: Right
-    { offset: 0.45, top: '545vh', width: '800px', left: '50%', right: 'auto', align: 'center', transform: 'translate(-50%, -50%)' }, // Skills: Center
-    { offset: 0.65, top: '765vh', width: '700px', left: '10%', right: 'auto', align: 'left', transform: 'translateY(-50%)' }, // Education: Left
-    { offset: 0.80, top: '930vh', width: '700px', left: 'auto', right: '10%', align: 'right', transform: 'translateY(-50%)' }, // Experience: Right
-    { offset: 0.92, top: '1062vh', width: '600px', left: '50%', right: 'auto', align: 'center', transform: 'translate(-50%, -50%)' }, // Contact: Center
+    // Intro
+    { offset: 0.0, top: '50vh', width: isMobile ? '90vw' : '700px', left: isMobile ? '50%' : '10%', right: 'auto', align: isMobile ? 'center' : 'left', transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)' }, 
+    // Projects
+    { offset: 0.25, top: '325vh', width: isMobile ? '90vw' : '700px', left: isMobile ? '50%' : 'auto', right: isMobile ? 'auto' : '10%', align: isMobile ? 'center' : 'right', transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)' },
+    // Skills
+    { offset: 0.45, top: '545vh', width: isMobile ? '90vw' : '800px', left: '50%', right: 'auto', align: 'center', transform: 'translate(-50%, -50%)' }, 
+    // Education
+    { offset: 0.65, top: '765vh', width: isMobile ? '90vw' : '700px', left: isMobile ? '50%' : '10%', right: 'auto', align: isMobile ? 'center' : 'left', transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)' }, 
+    // Experience
+    { offset: 0.80, top: '930vh', width: isMobile ? '90vw' : '700px', left: isMobile ? '50%' : 'auto', right: isMobile ? 'auto' : '10%', align: isMobile ? 'center' : 'right', transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)' }, 
+    // Contact
+    { offset: 0.92, top: '1062vh', width: isMobile ? '90vw' : '600px', left: '50%', right: 'auto', align: 'center', transform: 'translate(-50%, -50%)' }, 
   ];
 
   const getContainerStyle = (index) => ({
@@ -404,7 +443,7 @@ function Overlays() {
       {/* 3. Skills (Center) */}
       <motion.div className="system-section" style={{ ...getContainerStyle(2), alignItems: 'center' }} variants={variantsCenter} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
         <motion.h1 className="system-header" style={{ textAlign: 'center' }} variants={itemVariants}><DecodeText text="Abilities" /></motion.h1>
-        <motion.div className="system-content-block" style={{ pointerEvents: 'auto', width: '100%', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: '40px', borderRadius: '4px' }} variants={itemVariants}>
+        <motion.div className="system-content-block" style={{ pointerEvents: 'auto', width: '100%', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: isMobile ? '20px' : '40px', borderRadius: '4px' }} variants={itemVariants}>
           <div className="skills-grid">
             <div className="skill-item">
               <span className="skill-label">Languages</span>
@@ -444,30 +483,34 @@ function Overlays() {
             { label: "Bachelor's in CS", sub: "University of Calicut | 2019-2021" },
             { label: "Master's in Mobile Dev", sub: "CUSAT | 2022-2024" }
           ]}
-          pathData="M 30 10 L 10 40 L 50 65 L 70 95"
-          starCoords={[{ x: 30, y: 10 }, { x: 10, y: 40 }, { x: 50, y: 65 }, { x: 70, y: 95 }]}
-          height="600px"
+          pathData={isMobile ? "M 10 10 L 20 40 L 10 65 L 20 95" : "M 30 10 L 10 40 L 50 65 L 70 95"}
+          starCoords={isMobile 
+            ? [{ x: 10, y: 10 }, { x: 20, y: 40 }, { x: 10, y: 65 }, { x: 20, y: 95 }]
+            : [{ x: 30, y: 10 }, { x: 10, y: 40 }, { x: 50, y: 65 }, { x: 70, y: 95 }]}
+          height={isMobile ? "400px" : "600px"}
         />
       </motion.div>
 
       {/* 5. Experience (Right) */}
       <motion.div className="system-section" style={getContainerStyle(4)} variants={variantsRight} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
-        <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Combat Log" /></motion.h1>
+        <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Guild History" /></motion.h1>
         <ConstellationTimeline
           nodes={[
-            { label: "Junior Software Engineer", sub: "AcelrTech (Rapidor) | May 2024 – Present\nDevelop enterprise mobile applications using Flutter for B2B commerce and sales automation platforms.\nIntegrated REST APIs and Firebase services for authentication, notifications, and data synchronization.\nImplemented offline data caching and background synchronization for field sales usage." },
+            { label: "Freelance Flutter Dev", sub: "Upwork | June 2024 – Present\nDesigned and shipped full-stack mobile applications with Firebase integration." },
             { label: "Software Developer Intern", sub: "AcelrTech | Mar 2024 – May 2024\nContributed to production Flutter applications used by enterprise sales teams.\nResolved 200+ issues related to UI rendering, API integration, and mobile builds." }
           ]}
-          pathData="M 80 20 L 20 80"
-          starCoords={[{ x: 80, y: 20 }, { x: 20, y: 80 }]}
-          height="500px"
+          pathData={isMobile ? "M 15 20 L 25 80" : "M 80 20 L 20 80"}
+          starCoords={isMobile 
+            ? [{ x: 15, y: 20 }, { x: 25, y: 80 }]
+            : [{ x: 80, y: 20 }, { x: 20, y: 80 }]}
+          height={isMobile ? "300px" : "500px"}
         />
       </motion.div>
 
       {/* 6. Contact (Center) */}
       <motion.div className="system-section" style={{ ...getContainerStyle(5), alignItems: 'center' }} variants={variantsCenter} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.8 }}>
         <motion.h1 className="system-header" style={{ textAlign: 'center' }} variants={itemVariants}><DecodeText text="System Link" /></motion.h1>
-        <motion.div className="system-content-block" style={{ pointerEvents: 'auto', display: 'flex', gap: '20px', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: '40px', borderRadius: '4px' }} variants={itemVariants}>
+        <motion.div className="system-content-block" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '20px', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: isMobile ? '20px' : '40px', borderRadius: '4px' }} variants={itemVariants}>
           <a href="mailto:kiranlalk123@gmail.com" className="sys-btn">Email Connection</a>
           <a href="https://linkedin.com/in/kiranlalk" target="_blank" rel="noreferrer" className="sys-btn">LinkedIn Portal</a>
         </motion.div>
@@ -476,7 +519,7 @@ function Overlays() {
   );
 }
 
-export default function DeveloperRoomScene() {
+export default function DeveloperRoomScene({ isMobile }) {
   return (
     <>
       <color attach="background" args={['#020202']} />
@@ -484,7 +527,7 @@ export default function DeveloperRoomScene() {
       <ScrollControls pages={12} damping={0.25}>
         <CameraController />
         <StorybookDiorama />
-        <Overlays />
+        <Overlays isMobile={isMobile} />
         <NavListener />
       </ScrollControls>
 

@@ -440,3 +440,42 @@ section {
 .sys-btn:hover::before {
   left: 0;
 }
+
+/* ==========================================================================
+   Mobile Responsive Styles (max-width: 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .system-header {
+    font-size: 2.5rem !important; /* Scaled down from 5rem */
+  }
+  
+  .system-title {
+    font-size: 1.5rem !important; /* Scaled down from 2rem */
+  }
+
+  .system-subtitle {
+    font-size: 0.85rem !important;
+  }
+
+  .system-body {
+    font-size: 0.95rem !important; /* Slightly smaller for mobile readability */
+    line-height: 1.5 !important;
+  }
+  
+  .deity-sub {
+    font-size: 1.1rem !important;
+  }
+
+  .sys-btn {
+    padding: 10px 20px !important;
+    font-size: 1rem !important;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .system-content-block {
+    padding-left: 10px !important;
+  }
+}
