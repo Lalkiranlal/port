@@ -145,67 +145,67 @@ function StorybookDiorama() {
       {/* L0: Background Wall (Z=-100). Scaled massively to prevent visible edges at extreme angles. */}
       <mesh position={[0, 0, -100]}>
         <planeGeometry args={[900, 504]} />
-        <meshBasicMaterial map={bgTex} depthWrite={false} />
+        <meshBasicMaterial map={bgTex} depthWrite={false} color="#999999" />
       </mesh>
 
       {/* L1: Secondary Mist / Background Overlay (Z=-80) */}
       <mesh position={[0, -20, -80]}>
         <planeGeometry args={[600, 450]} />
-        <meshBasicMaterial map={partTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.6} />
+        <meshBasicMaterial map={partTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.3} color="#777777" />
       </mesh>
 
       {/* L2: Distant Left Pillar (Z=-70) */}
       <mesh position={[-40, -10, -70]}>
         <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial map={shelfTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
+        <meshBasicMaterial map={shelfTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.4} color="#aaaaaa" />
       </mesh>
 
       {/* L3: Experience Tree / Main Statue (Z=-60). Offset Right. */}
       <mesh position={[25, 0, -60]}>
         <planeGeometry args={[120, 120]} />
-        <meshBasicMaterial map={treeTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
+        <meshBasicMaterial map={treeTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.4} color="#aaaaaa" />
       </mesh>
 
       {/* L4: Distant Magic Runes (Z=-50). Offset Left. */}
       <mesh position={[-30, 20, -50]}>
         <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial map={holoTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.5} />
+        <meshBasicMaterial map={holoTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.2} color="#777777" />
       </mesh>
 
       {/* L5: About Me Pillar (Z=-40). Offset Left. */}
       <mesh position={[-25, 0, -40]}>
         <planeGeometry args={[120, 120]} />
-        <meshBasicMaterial map={shelfTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
+        <meshBasicMaterial map={shelfTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.4} color="#aaaaaa" />
       </mesh>
 
       {/* L6: Ground Aura Extradition (Z=-30) */}
       <mesh position={[0, -20, -30]}>
         <planeGeometry args={[200, 200]} />
-        <meshBasicMaterial map={deskTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.7} />
+        <meshBasicMaterial map={deskTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.3} color="#888888" />
       </mesh>
 
       {/* L7: Skills Hologram (Z=-20). Offset Right. */}
       <mesh position={[25 + fgOffset, 5, -20]}>
         <planeGeometry args={[120, 120]} />
-        <meshBasicMaterial map={holoTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
+        <meshBasicMaterial map={holoTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.4} color="#888888" />
       </mesh>
 
       {/* L8: Right Foreground Statue (Z=-10). Offset Right */}
       <mesh position={[40 - fgOffset, -15, -10]}>
         <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial map={treeTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
+        <meshBasicMaterial map={treeTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.5} color="#bbbbbb" />
       </mesh>
 
       {/* L9: Intro Desk / Ground Source (Z=0). Center. */}
       <mesh position={[0 + fgOffset * 0.5, -10, 0]}>
         <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial map={deskTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
+        <meshBasicMaterial map={deskTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.6} color="#cccccc" />
       </mesh>
 
       {/* L10: Foreground Particles (Z=20). */}
       <mesh position={[0, 0, 20]}>
         <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial map={partTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} />
+        <meshBasicMaterial map={partTex} blending={THREE.AdditiveBlending} transparent={true} depthWrite={false} opacity={0.2} color="#777777" />
       </mesh>
     </group>
   );
@@ -547,7 +547,7 @@ export default function DeveloperRoomScene({ isMobile }) {
       {/* High-Performance Post-Processing for 2D Diorama */}
       <EffectComposer disableNormalPass multisampling={0}>
         {/* Soft, magical bloom to enhance the 2D layered assets */}
-        <Bloom luminanceThreshold={0.2} mipmapBlur intensity={1.5} radius={0.8} />
+        <Bloom luminanceThreshold={0.2} mipmapBlur intensity={0.8} radius={0.8} />
       </EffectComposer>
     </>
   );
