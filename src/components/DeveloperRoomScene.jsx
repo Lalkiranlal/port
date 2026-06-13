@@ -138,226 +138,231 @@ function CameraController() {
   useFrame((state) => {
     const offset = scroll.offset;
     const targetLookAt = new THREE.Vector3();
-
-    // Smoothly interpolate scroll offset for camera movement
-    if (offset < 0.15) {
-      const t = offset / 0.15;
-      vec.lerpVectors(new THREE.Vector3(0, 10, 40), pIntro, t);
-      targetLookAt.lerpVectors(new THREE.Vector3(0, -5, 0), tIntro, t);
-    }
-    else if (offset < 0.20) {
+    
+    // Exact mapping of pause phases and transitions
+    // Intro
+    if (offset < 0.10) {
       vec.copy(pIntro);
       targetLookAt.copy(tIntro);
     }
-    else if (offset < 0.35) {
-      const t = (offset - 0.20) / 0.15;
+    // Intro -> Projects
+    else if (offset < 0.20) {
+      const t = (offset - 0.10) / 0.10;
       vec.lerpVectors(pIntro, pProjects, t);
       targetLookAt.lerpVectors(tIntro, tProjects, t);
     }
-    else if (offset < 0.40) {
+    // Projects Lock (Center: 0.25)
+    else if (offset < 0.30) {
       vec.copy(pProjects);
       targetLookAt.copy(tProjects);
     }
-    else if (offset < 0.55) {
-      const t = (offset - 0.40) / 0.15;
+    // Projects -> Skills
+    else if (offset < 0.40) {
+      const t = (offset - 0.30) / 0.10;
       vec.lerpVectors(pProjects, pSkills, t);
       targetLookAt.lerpVectors(tProjects, tSkills, t);
     }
-    else if (offset < 0.60) {
+    // Skills Lock (Center: 0.45)
+    else if (offset < 0.50) {
       vec.copy(pSkills);
       targetLookAt.copy(tSkills);
     }
-    else if (offset < 0.75) {
-      const t = (offset - 0.60) / 0.15;
+    // Skills -> About
+    else if (offset < 0.60) {
+      const t = (offset - 0.50) / 0.10;
       vec.lerpVectors(pSkills, pAbout, t);
       targetLookAt.lerpVectors(tSkills, tAbout, t);
     }
-    else if (offset < 0.80) {
+    // About Lock (Center: 0.65)
+    else if (offset < 0.70) {
       vec.copy(pAbout);
       targetLookAt.copy(tAbout);
     }
-    else if (offset < 0.95) {
-      const t = (offset - 0.80) / 0.15;
+    // About -> Experience
+    else if (offset < 0.75) {
+      const t = (offset - 0.70) / 0.05;
       vec.lerpVectors(pAbout, pExperience, t);
       targetLookAt.lerpVectors(tAbout, tExperience, t);
     }
-    else if (offset < 0.98) {
+    // Experience Lock (Center: 0.80)
+    else if (offset < 0.85) {
       vec.copy(pExperience);
       targetLookAt.copy(tExperience);
     }
-    else {
-      const t = (offset - 0.98) / 0.02;
+    // Experience -> Contact
+    else if (offset < 0.90) {
+      const t = (offset - 0.85) / 0.05;
       vec.lerpVectors(pExperience, pContact, t);
       targetLookAt.lerpVectors(tExperience, tContact, t);
+    }
+    // Contact Lock
+    else {
+      vec.copy(pContact);
+      targetLookAt.copy(tContact);
     }
 
     state.camera.position.lerp(vec, 0.05);
     currentLookAt.lerp(targetLookAt, 0.05);
     state.camera.lookAt(currentLookAt);
   });
-
   return null;
-}
-
-// 3. The 3D UI Overlay Engine (Parallax Cards)
-function AnimatedGlassNode({ position, width = '500px', children }) {
-  // Refactored to be a TRUE 3D object in space. No opacity hiding needed!
-  return (
-    <Billboard position={position}>
-      <Html transform distanceFactor={15} center>
-        <div 
-          className="system-window hud-container" 
-          style={{ 
-            width, 
-            pointerEvents: 'auto'
-          }}
-        >
-          {/* Deep Background Layer (Inner Parallax) */}
-          <div style={{
-            position: 'absolute',
-            top: '-20%', left: '-20%', width: '140%', height: '140%',
-            backgroundImage: `url(${mgHologramImg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.15,
-            pointerEvents: 'none',
-            mixBlendMode: 'screen',
-            zIndex: -1
-          }} />
-          
-          {/* Hovering Foreground Layer (The Text) */}
-          <div style={{ position: 'relative' }}>
-            {children}
-          </div>
-        </div>
-      </Html>
-    </Billboard>
-  );
 }
 
 function NavListener() {
   const scroll = useScroll();
+
   useEffect(() => {
-    const handleNav = (e) => {
-      if (scroll.el) {
-        // Correct scroll target calculation based on max scrollable height
+    const handleNavClick = (e) => {
+      if (scroll && scroll.el) {
         const maxScroll = scroll.el.scrollHeight - scroll.el.clientHeight;
         const targetScroll = maxScroll * e.detail.offset;
         scroll.el.scrollTo({ top: targetScroll, behavior: 'smooth' });
       }
     };
-    window.addEventListener('nav-click', handleNav);
-    return () => window.removeEventListener('nav-click', handleNav);
+    window.addEventListener('nav-click', handleNavClick);
+    return () => window.removeEventListener('nav-click', handleNavClick);
   }, [scroll]);
+
   return null;
 }
-
 function Overlays() {
+  const sections = [
+    { offset: 0.0, top: '50vh', width: '700px', left: '10%', right: 'auto', align: 'left', transform: 'translateY(-50%)' }, // Intro: Left
+    { offset: 0.25, top: '325vh', width: '700px', left: 'auto', right: '10%', align: 'right', transform: 'translateY(-50%)' }, // Projects: Right
+    { offset: 0.45, top: '545vh', width: '800px', left: '50%', right: 'auto', align: 'center', transform: 'translate(-50%, -50%)' }, // Skills: Center
+    { offset: 0.65, top: '765vh', width: '700px', left: '10%', right: 'auto', align: 'left', transform: 'translateY(-50%)' }, // Education: Left
+    { offset: 0.80, top: '930vh', width: '700px', left: 'auto', right: '10%', align: 'right', transform: 'translateY(-50%)' }, // Experience: Right
+    { offset: 0.92, top: '1062vh', width: '600px', left: '50%', right: 'auto', align: 'center', transform: 'translate(-50%, -50%)' }, // Contact: Center
+  ];
+
+  const getContainerStyle = (index) => ({
+    position: 'absolute',
+    top: sections[index].top,
+    left: sections[index].left,
+    right: sections[index].right,
+    transform: sections[index].transform,
+    width: sections[index].width,
+    zIndex: 10,
+    pointerEvents: 'none'
+  });
+
   return (
-    <group>
-      {/* 1. Intro (0.00 - 0.25) -> Expanded range */}
-      <AnimatedGlassNode position={[-5, 0, 0]} startRange={0.0} endRange={0.25} width="600px">
-        <p className="hud-subtitle">Professional Summary</p>
-        <p className="hud-text">
-          <TypewriterText text="Flutter Developer with nearly 2 years of experience building scalable enterprise mobile applications. Experienced in developing cross-platform apps using Flutter, REST APIs, and Firebase. Strong background in offline-first architecture, B2B commerce platforms, and sales force automation tools. Proven ability to build production mobile apps used by field sales teams and enterprise clients." speed={15} />
-        </p>
-      </AnimatedGlassNode>
-
-      {/* 2. Projects (0.25 - 0.45) -> Expanded range */}
-      <AnimatedGlassNode position={[15, -2, -10]} startRange={0.25} endRange={0.45} width="600px">
-        <h2 className="hud-title" style={{ color: '#ffbd2e' }}>Projects</h2>
-        <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '10px' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h3 style={{ color: '#00f0ff', margin: '0 0 5px 0' }}>Rapidor Enterprise Sales Platform</h3>
-            <ul style={{ color: 'var(--color-text-main)', paddingLeft: '20px', margin: 0, fontSize: '0.95rem' }}>
-              <li>Developed features for smart catalogue management, fast order creation, and price updates.</li>
-              <li>Implemented offline order creation with AutoSync to synchronize orders when connectivity returns.</li>
-              <li>Built modules for offer management, product performance tracking, and communication.</li>
-              <li>Integrated ERP systems including SAP, Tally, and QuickBooks.</li>
-            </ul>
-          </div>
-          <div style={{ marginBottom: '1rem' }}>
-            <h3 style={{ color: '#00f0ff', margin: '0 0 5px 0' }}>PlaceOrder – B2B Marketplace</h3>
-            <ul style={{ color: 'var(--color-text-main)', paddingLeft: '20px', margin: 0, fontSize: '0.95rem' }}>
-              <li>Contributed to a B2B marketplace enabling businesses to buy and sell products digitally.</li>
-              <li>Implemented product browsing, order placement, and backend API integrations.</li>
-            </ul>
-          </div>
-          <div>
-            <h3 style={{ color: '#00f0ff', margin: '0 0 5px 0' }}>Ezy Reports – Lifeex India</h3>
-            <ul style={{ color: 'var(--color-text-main)', paddingLeft: '20px', margin: 0, fontSize: '0.95rem' }}>
-              <li>Developed reporting application for medical sales representatives.</li>
-              <li>Implemented doctor visit tracking, order reports, and activity logging.</li>
-            </ul>
-          </div>
+    <Scroll html style={{ width: '100vw' }}>
+      {/* 1. Intro (Left) */}
+      <div className="system-section" style={getContainerStyle(0)}>
+        <h1 className="system-header">Kiran Lal K</h1>
+        <div className="system-content-block" style={{ pointerEvents: 'auto' }}>
+          <h2 className="system-title">Flutter Developer</h2>
+          <div className="system-subtitle">Class: Mobile Engineer | Lvl: 24</div>
+          <p className="system-body">
+            With nearly 2 years of experience building scalable enterprise mobile applications. Experienced in developing cross-platform apps using Flutter, REST APIs, and Firebase. Strong background in offline-first architecture, B2B commerce platforms, and sales force automation tools.
+          </p>
         </div>
-      </AnimatedGlassNode>
+      </div>
 
-      {/* 3. Skills (0.45 - 0.65) */}
-      <AnimatedGlassNode position={[20, 0, -25]} startRange={0.45} endRange={0.65} width="550px">
-        <h2 className="hud-title" style={{ color: '#ffbd2e' }}>Technical Skills</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
-          <div><strong style={{color: '#fff'}}>Languages:</strong> <span style={{color: '#00f0ff'}}>Dart, Swift, Java, Python</span></div>
-          <div><strong style={{color: '#fff'}}>Frameworks:</strong> <span style={{color: '#00f0ff'}}>Flutter, UIKit, SwiftUI (Basic)</span></div>
-          <div><strong style={{color: '#fff'}}>Mobile Dev:</strong> <span style={{color: '#00f0ff'}}>REST API, JSON Parsing, Offline Storage, Push Notifications</span></div>
-          <div><strong style={{color: '#fff'}}>State Mgmt:</strong> <span style={{color: '#00f0ff'}}>Provider, Riverpod (Basic)</span></div>
-          <div><strong style={{color: '#fff'}}>Backend:</strong> <span style={{color: '#00f0ff'}}>Firebase Auth, Firestore, Cloud Messaging</span></div>
-          <div><strong style={{color: '#fff'}}>Databases:</strong> <span style={{color: '#00f0ff'}}>SQLite, ObjectBox, CoreData</span></div>
-          <div><strong style={{color: '#fff'}}>Tools:</strong> <span style={{color: '#00f0ff'}}>Git, GitHub, Android Studio, Xcode, Test Flight</span></div>
-          <div><strong style={{color: '#fff'}}>Architecture:</strong> <span style={{color: '#00f0ff'}}>MVC, MVVM</span></div>
+      {/* 2. Projects (Right) */}
+      <div className="system-section" style={getContainerStyle(1)}>
+        <h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }}>Active Quests</h1>
+        
+        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
+          <h2 className="system-title">Rapidor Enterprise Sales Platform</h2>
+          <div className="system-subtitle">Rank: S-Class</div>
+          <p className="system-body">
+            Developed features for smart catalogue management, fast order creation, and price updates. Implemented offline order creation with AutoSync to synchronize orders when connectivity returns. Built modules for offer management, product performance tracking, and communication. Integrated ERP systems including SAP, Tally, and QuickBooks.
+          </p>
         </div>
-      </AnimatedGlassNode>
 
-      {/* 4. Education (About Me replaced with Education) (0.65 - 0.80) */}
-      <AnimatedGlassNode position={[-15, 0, -35]} startRange={0.65} endRange={0.80} width="550px">
-        <h2 className="hud-title" style={{ color: '#ffbd2e' }}>Education</h2>
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h3 style={{ color: '#00f0ff', margin: '0 0 5px 0' }}>Master's in Mobile Application Development</h3>
-          <p style={{ color: 'var(--color-text-main)', margin: '0' }}>Cochin University of Science and Technology (CUSAT)<br/>2022 – 2024</p>
+        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
+          <h2 className="system-title">PlaceOrder – B2B Marketplace</h2>
+          <div className="system-subtitle">Rank: A-Class | ONDC Integrated</div>
+          <p className="system-body">
+            Contributed to a B2B marketplace enabling businesses to buy and sell products digitally. Implemented product browsing, order placement, and backend API integrations.
+          </p>
         </div>
-        <div>
-          <h3 style={{ color: '#00f0ff', margin: '0 0 5px 0' }}>Bachelor's in Computer Science</h3>
-          <p style={{ color: 'var(--color-text-main)', margin: '0' }}>University of Calicut<br/>2019 – 2022</p>
-        </div>
-      </AnimatedGlassNode>
 
-      {/* 5. Experience (0.80 - 0.92) */}
-      <AnimatedGlassNode position={[15, 0, -55]} startRange={0.80} endRange={0.92} width="600px">
-        <h2 className="hud-title" style={{ color: '#ffbd2e' }}>Professional Experience</h2>
-        <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '10px' }}>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ color: '#00f0ff', margin: '0 0 5px 0' }}>Junior Software Engineer <span style={{color: '#fff', fontSize: '0.9rem'}}>(May 2024 – Present)</span></h3>
-            <p style={{ color: '#ffbd2e', margin: '0 0 10px 0', fontSize: '0.9rem' }}>AcelrTech (Rapidor)</p>
-            <ul style={{ color: 'var(--color-text-main)', paddingLeft: '20px', margin: 0, fontSize: '0.95rem' }}>
-              <li>Develop enterprise mobile applications using Flutter for B2B commerce and sales automation platforms.</li>
-              <li>Built modules including order management, merchandising, reporting, and returns workflows.</li>
-              <li>Integrated REST APIs and Firebase services for authentication, notifications, and data synchronization.</li>
-              <li>Implemented offline data caching and background synchronization for field sales usage.</li>
-              <li>Improved UI performance and application stability across Android and iOS devices.</li>
-            </ul>
-          </div>
-          <div>
-            <h3 style={{ color: '#00f0ff', margin: '0 0 5px 0' }}>Software Developer Intern <span style={{color: '#fff', fontSize: '0.9rem'}}>(Mar 2024 – May 2024)</span></h3>
-            <p style={{ color: '#ffbd2e', margin: '0 0 10px 0', fontSize: '0.9rem' }}>AcelrTech (Rapidor)</p>
-            <ul style={{ color: 'var(--color-text-main)', paddingLeft: '20px', margin: 0, fontSize: '0.95rem' }}>
-              <li>Contributed to production Flutter applications used by enterprise sales teams.</li>
-              <li>Resolved 200+ issues related to UI rendering, API integration, and mobile builds.</li>
-            </ul>
+        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
+          <h2 className="system-title">Ezy Reports – Lifeex India</h2>
+          <div className="system-subtitle">Rank: A-Class</div>
+          <p className="system-body">
+            Developed reporting application for medical sales representatives. Implemented doctor visit tracking, order reports, and activity logging.
+          </p>
+        </div>
+      </div>
+
+      {/* 3. Skills (Center) */}
+      <div className="system-section" style={{ ...getContainerStyle(2), alignItems: 'center' }}>
+        <h1 className="system-header" style={{ textAlign: 'center' }}>Abilities</h1>
+        <div className="system-content-block" style={{ pointerEvents: 'auto', width: '100%', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: '40px', borderRadius: '4px' }}>
+          <div className="skills-grid">
+            <div className="skill-item">
+              <span className="skill-label">Languages</span>
+              <span className="skill-value">Dart, Swift, Java, Python</span>
+            </div>
+            <div className="skill-item">
+              <span className="skill-label">Frameworks</span>
+              <span className="skill-value">Flutter, UIKit, SwiftUI (Basic)</span>
+            </div>
+            <div className="skill-item">
+              <span className="skill-label">Mobile Dev</span>
+              <span className="skill-value">REST API, JSON, Offline Storage, Push Notifications</span>
+            </div>
+            <div className="skill-item">
+              <span className="skill-label">State Mgmt</span>
+              <span className="skill-value">Provider, Riverpod</span>
+            </div>
+            <div className="skill-item">
+              <span className="skill-label">Backend & DB</span>
+              <span className="skill-value">Firebase Auth/Firestore, SQLite, ObjectBox, CoreData</span>
+            </div>
+            <div className="skill-item">
+              <span className="skill-label">Tools & Patterns</span>
+              <span className="skill-value">Git, Android Studio, Xcode, MVC, MVVM</span>
+            </div>
           </div>
         </div>
-      </AnimatedGlassNode>
+      </div>
 
-      {/* 6. Contact (0.92 - 1.0) */}
-      <AnimatedGlassNode position={[0, 0, -80]} startRange={0.92} endRange={1.0} width="400px">
-        <h2 className="hud-title" style={{ color: '#ffbd2e' }}>SYSTEM CONNECTION</h2>
-        <p className="hud-text" style={{ textAlign: 'center' }}>
-          Email: kiranlalk123@gmail.com<br/>
-          Phone: +91 8137852521<br/>
-          LinkedIn: linkedin.com/in/kiranlalk<br/>
-          Location: Kerala, India
-        </p>
-      </AnimatedGlassNode>
-    </group>
+      {/* 4. Education (Left) */}
+      <div className="system-section" style={getContainerStyle(3)}>
+        <h1 className="system-header">Origins</h1>
+        <div className="system-content-block" style={{ pointerEvents: 'auto' }}>
+          <h2 className="system-title">Master's in Mobile Application Development</h2>
+          <div className="system-subtitle">Cochin University of Science and Technology (CUSAT) | 2022-2024</div>
+        </div>
+        <div className="system-content-block" style={{ pointerEvents: 'auto' }}>
+          <h2 className="system-title">Bachelor's in Computer Science</h2>
+          <div className="system-subtitle">University of Calicut | 2019-2021</div>
+        </div>
+      </div>
+
+      {/* 5. Experience (Right) */}
+      <div className="system-section" style={getContainerStyle(4)}>
+        <h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }}>Combat Log</h1>
+        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
+          <h2 className="system-title">Junior Software Engineer</h2>
+          <div className="system-subtitle">AcelrTech (Rapidor) | May 2024 – Present</div>
+          <p className="system-body">
+            Develop enterprise mobile applications using Flutter for B2B commerce and sales automation platforms. Built modules including order management, merchandising, reporting, and returns workflows. Integrated REST APIs and Firebase services for authentication, notifications, and data synchronization. Implemented offline data caching and background synchronization for field sales usage. Improved UI performance and application stability across Android and iOS devices.
+          </p>
+        </div>
+        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
+          <h2 className="system-title">Software Developer Intern</h2>
+          <div className="system-subtitle">AcelrTech | Mar 2024 – May 2024</div>
+          <p className="system-body">
+            Contributed to production Flutter applications used by enterprise sales teams. Resolved 200+ issues related to UI rendering, API integration, and mobile builds.
+          </p>
+        </div>
+      </div>
+
+      {/* 6. Contact (Center) */}
+      <div className="system-section" style={{ ...getContainerStyle(5), alignItems: 'center' }}>
+        <h1 className="system-header" style={{ textAlign: 'center' }}>System Link</h1>
+        <div className="system-content-block" style={{ pointerEvents: 'auto', display: 'flex', gap: '20px', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: '40px', borderRadius: '4px' }}>
+          <a href="mailto:kiranlalk123@gmail.com" className="sys-btn">Email Connection</a>
+          <a href="https://linkedin.com/in/kiranlalk" target="_blank" rel="noreferrer" className="sys-btn">LinkedIn Portal</a>
+        </div>
+      </div>
+    </Scroll>
   );
 }
 
