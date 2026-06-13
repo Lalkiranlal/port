@@ -13,22 +13,99 @@ import fgDeskImg from '../assets/fg_desk.png';
 import fgParticlesImg from '../assets/fg_particles.png';
 import nameLogoImg from '../assets/name_logo.png';
 
-// Digit by Digit Typewriter Effect Component
-function TypewriterText({ text, speed = 30 }) {
-  const [displayed, setDisplayed] = useState('');
+// System Decode Text Effect
+const DecodeText = ({ text, className, delay = 0 }) => {
+  const [displayText, setDisplayText] = useState('');
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*';
 
-  useEffect(() => {
-    let i = 0;
+  const startDecode = () => {
+    if (hasAnimated) return;
+    setHasAnimated(true);
+    let iterations = 0;
     const interval = setInterval(() => {
-      setDisplayed(text.substring(0, i));
-      i++;
-      if (i > text.length) clearInterval(interval);
-    }, speed);
-    return () => clearInterval(interval);
-  }, [text, speed]);
+      setDisplayText(
+        text.split('').map((letter, index) => {
+          if (letter === ' ') return ' ';
+          if (index < iterations) return text[index];
+          return chars[Math.floor(Math.random() * chars.length)];
+        }).join('')
+      );
+      if (iterations >= text.length) clearInterval(interval);
+      iterations += 1 / 3; // speed of decode
+    }, 30);
+  };
 
-  return <span>{displayed}</span>;
-}
+  return (
+    <motion.span 
+      className={className}
+      onViewportEnter={() => setTimeout(startDecode, delay)}
+      viewport={{ once: true, amount: 0.8 }}
+    >
+      {displayText}
+    </motion.span>
+  );
+};
+
+// Constellation Timeline Component (Aries & Experience)
+const ConstellationTimeline = ({ nodes, pathData, starCoords, height = '400px' }) => {
+  return (
+    <div style={{ position: 'relative', width: '100%', height: height, marginTop: '2rem' }}>
+      <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', overflow: 'visible', zIndex: -1 }}>
+        <motion.path 
+          d={pathData} 
+          stroke="var(--color-sys-blue)" 
+          strokeWidth="0.5" 
+          fill="transparent"
+          initial={{ pathLength: 0 }}
+          whileInView={{ pathLength: 1 }}
+          transition={{ duration: 2, ease: "easeInOut" }}
+          style={{ filter: 'drop-shadow(0 0 5px var(--color-sys-blue))' }}
+        />
+
+      </svg>
+      {nodes.map((node, i) => (
+        <motion.div key={`text-${i}`} 
+          initial={{ opacity: 0, x: -10 }} 
+          whileInView={{ opacity: 1, x: 0 }} 
+          transition={{ delay: 0.5 + i * 0.4 }}
+          style={{ 
+            position: 'absolute', 
+            left: `${starCoords[i].x}%`, 
+            top: `${starCoords[i].y}%`, 
+            color: '#fff', 
+            textShadow: '0 5px 10px rgba(0,0,0,1), 0 0 15px rgba(0,0,0,0.8)', 
+            minWidth: '280px',
+            pointerEvents: 'auto',
+            transform: 'translate(-10px, -10px)', /* Center the star on the line */
+            zIndex: 20
+          }}
+        >
+           {/* The Star Shape */}
+           <div style={{ 
+             width: '20px', height: '20px', 
+             background: '#00f0ff',
+             clipPath: 'polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%)',
+             boxShadow: '0 0 20px #00f0ff',
+             position: 'absolute',
+             top: '0', left: '0',
+             zIndex: 20
+           }} />
+           
+           <div style={{ paddingLeft: '35px' }}>
+             <strong style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
+             <DecodeText text={node.label} />
+           </strong>
+           <br/>
+           <span style={{ color: '#00f0ff', fontSize: '1.05rem', fontFamily: 'monospace', whiteSpace: 'pre-wrap', textShadow: '0 2px 4px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8)' }}>
+             <DecodeText text={node.sub} delay={200} />
+           </span>
+           </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
 
 // 1. The 10-Layer Epic Shadow Monarch Diorama
 function StorybookDiorama() {
@@ -223,6 +300,13 @@ function NavListener() {
     return () => window.removeEventListener('nav-click', handleNavClick);
   }, [scroll]);
 
+  // Dispatch current scroll offset to window for the VerticalNavigation component
+  useFrame(() => {
+    if (scroll) {
+      window.dispatchEvent(new CustomEvent('scroll-update', { detail: { offset: scroll.offset } }));
+    }
+  });
+
   return null;
 }
 function Overlays() {
@@ -246,53 +330,81 @@ function Overlays() {
     pointerEvents: 'none'
   });
 
+  const variantsLeft = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.8, staggerChildren: 0.2 } },
+  };
+
+  const variantsRight = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.8, staggerChildren: 0.2 } },
+  };
+
+  const variantsCenter = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, staggerChildren: 0.2 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  const barVariants = {
+    hidden: { width: 0 },
+    visible: (width) => ({
+      width: width,
+      transition: { duration: 1.2, delay: 0.5, ease: 'easeOut' }
+    }),
+  };
+
   return (
     <Scroll html style={{ width: '100vw' }}>
       {/* 1. Intro (Left) */}
-      <div className="system-section" style={getContainerStyle(0)}>
-        <h1 className="system-header">Kiran Lal K</h1>
-        <div className="system-content-block" style={{ pointerEvents: 'auto' }}>
-          <h2 className="system-title">Flutter Developer</h2>
-          <div className="system-subtitle">Class: Mobile Engineer | Lvl: 24</div>
+      <motion.div className="system-section" style={getContainerStyle(0)} variants={variantsLeft} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
+        <motion.h1 className="system-header" variants={itemVariants}><DecodeText text="Kiran Lal K" /></motion.h1>
+        <motion.div className="system-content-block" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
+          <h2 className="system-title"><DecodeText text="Flutter Developer" delay={100} /></h2>
+          <div className="system-subtitle"><DecodeText text="Class: Mobile Engineer | Lvl: 24" delay={200} /></div>
           <p className="system-body">
             With nearly 2 years of experience building scalable enterprise mobile applications. Experienced in developing cross-platform apps using Flutter, REST APIs, and Firebase. Strong background in offline-first architecture, B2B commerce platforms, and sales force automation tools.
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* 2. Projects (Right) */}
-      <div className="system-section" style={getContainerStyle(1)}>
-        <h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }}>Active Quests</h1>
+      <motion.div className="system-section" style={getContainerStyle(1)} variants={variantsRight} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }}>
+        <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Active Quests" /></motion.h1>
         
-        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
-          <h2 className="system-title">Rapidor Enterprise Sales Platform</h2>
-          <div className="system-subtitle">Rank: S-Class</div>
+        <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
+          <h2 className="system-title"><DecodeText text="Rapidor Enterprise Sales Platform" delay={100} /></h2>
+          <div className="system-subtitle"><DecodeText text="B2B Commerce & SFA" delay={200} /></div>
           <p className="system-body">
             Developed features for smart catalogue management, fast order creation, and price updates. Implemented offline order creation with AutoSync to synchronize orders when connectivity returns. Built modules for offer management, product performance tracking, and communication. Integrated ERP systems including SAP, Tally, and QuickBooks.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
-          <h2 className="system-title">PlaceOrder – B2B Marketplace</h2>
-          <div className="system-subtitle">Rank: A-Class | ONDC Integrated</div>
+        <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
+          <h2 className="system-title"><DecodeText text="PlaceOrder – B2B Marketplace" delay={100} /></h2>
+          <div className="system-subtitle"><DecodeText text="ONDC Integrated Platform" delay={200} /></div>
           <p className="system-body">
             Contributed to a B2B marketplace enabling businesses to buy and sell products digitally. Implemented product browsing, order placement, and backend API integrations.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
-          <h2 className="system-title">Ezy Reports – Lifeex India</h2>
-          <div className="system-subtitle">Rank: A-Class</div>
+        <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
+          <h2 className="system-title"><DecodeText text="Ezy Reports – Lifeex India" delay={100} /></h2>
+          <div className="system-subtitle"><DecodeText text="Medical Sales Reporter" delay={200} /></div>
           <p className="system-body">
             Developed reporting application for medical sales representatives. Implemented doctor visit tracking, order reports, and activity logging.
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* 3. Skills (Center) */}
-      <div className="system-section" style={{ ...getContainerStyle(2), alignItems: 'center' }}>
-        <h1 className="system-header" style={{ textAlign: 'center' }}>Abilities</h1>
-        <div className="system-content-block" style={{ pointerEvents: 'auto', width: '100%', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: '40px', borderRadius: '4px' }}>
+      <motion.div className="system-section" style={{ ...getContainerStyle(2), alignItems: 'center' }} variants={variantsCenter} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
+        <motion.h1 className="system-header" style={{ textAlign: 'center' }} variants={itemVariants}><DecodeText text="Abilities" /></motion.h1>
+        <motion.div className="system-content-block" style={{ pointerEvents: 'auto', width: '100%', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: '40px', borderRadius: '4px' }} variants={itemVariants}>
           <div className="skills-grid">
             <div className="skill-item">
               <span className="skill-label">Languages</span>
@@ -319,49 +431,47 @@ function Overlays() {
               <span className="skill-value">Git, Android Studio, Xcode, MVC, MVVM</span>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* 4. Education (Left) */}
-      <div className="system-section" style={getContainerStyle(3)}>
-        <h1 className="system-header">Origins</h1>
-        <div className="system-content-block" style={{ pointerEvents: 'auto' }}>
-          <h2 className="system-title">Master's in Mobile Application Development</h2>
-          <div className="system-subtitle">Cochin University of Science and Technology (CUSAT) | 2022-2024</div>
-        </div>
-        <div className="system-content-block" style={{ pointerEvents: 'auto' }}>
-          <h2 className="system-title">Bachelor's in Computer Science</h2>
-          <div className="system-subtitle">University of Calicut | 2019-2021</div>
-        </div>
-      </div>
+      <motion.div className="system-section" style={getContainerStyle(3)} variants={variantsLeft} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
+        <motion.h1 className="system-header" variants={itemVariants}><DecodeText text="Origins" /></motion.h1>
+        <ConstellationTimeline 
+          nodes={[
+            { label: "10th Standard", sub: "VMHSS School, Palakkad" },
+            { label: "Higher Secondary", sub: "GBHSS, Palakkad" },
+            { label: "Bachelor's in CS", sub: "University of Calicut | 2019-2021" },
+            { label: "Master's in Mobile Dev", sub: "CUSAT | 2022-2024" }
+          ]}
+          pathData="M 30 10 L 10 40 L 50 65 L 70 95"
+          starCoords={[{x: 30, y: 10}, {x: 10, y: 40}, {x: 50, y: 65}, {x: 70, y: 95}]}
+          height="600px"
+        />
+      </motion.div>
 
       {/* 5. Experience (Right) */}
-      <div className="system-section" style={getContainerStyle(4)}>
-        <h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }}>Combat Log</h1>
-        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
-          <h2 className="system-title">Junior Software Engineer</h2>
-          <div className="system-subtitle">AcelrTech (Rapidor) | May 2024 – Present</div>
-          <p className="system-body">
-            Develop enterprise mobile applications using Flutter for B2B commerce and sales automation platforms. Built modules including order management, merchandising, reporting, and returns workflows. Integrated REST APIs and Firebase services for authentication, notifications, and data synchronization. Implemented offline data caching and background synchronization for field sales usage. Improved UI performance and application stability across Android and iOS devices.
-          </p>
-        </div>
-        <div className="system-content-block right-align" style={{ pointerEvents: 'auto' }}>
-          <h2 className="system-title">Software Developer Intern</h2>
-          <div className="system-subtitle">AcelrTech | Mar 2024 – May 2024</div>
-          <p className="system-body">
-            Contributed to production Flutter applications used by enterprise sales teams. Resolved 200+ issues related to UI rendering, API integration, and mobile builds.
-          </p>
-        </div>
-      </div>
+      <motion.div className="system-section" style={getContainerStyle(4)} variants={variantsRight} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
+        <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Combat Log" /></motion.h1>
+        <ConstellationTimeline 
+          nodes={[
+            { label: "Junior Software Engineer", sub: "AcelrTech (Rapidor) | May 2024 – Present\nDevelop enterprise mobile applications using Flutter for B2B commerce and sales automation platforms.\nIntegrated REST APIs and Firebase services for authentication, notifications, and data synchronization.\nImplemented offline data caching and background synchronization for field sales usage." },
+            { label: "Software Developer Intern", sub: "AcelrTech | Mar 2024 – May 2024\nContributed to production Flutter applications used by enterprise sales teams.\nResolved 200+ issues related to UI rendering, API integration, and mobile builds." }
+          ]}
+          pathData="M 80 20 L 20 80"
+          starCoords={[{x: 80, y: 20}, {x: 20, y: 80}]}
+          height="500px"
+        />
+      </motion.div>
 
       {/* 6. Contact (Center) */}
-      <div className="system-section" style={{ ...getContainerStyle(5), alignItems: 'center' }}>
-        <h1 className="system-header" style={{ textAlign: 'center' }}>System Link</h1>
-        <div className="system-content-block" style={{ pointerEvents: 'auto', display: 'flex', gap: '20px', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: '40px', borderRadius: '4px' }}>
+      <motion.div className="system-section" style={{ ...getContainerStyle(5), alignItems: 'center' }} variants={variantsCenter} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.8 }}>
+        <motion.h1 className="system-header" style={{ textAlign: 'center' }} variants={itemVariants}><DecodeText text="System Link" /></motion.h1>
+        <motion.div className="system-content-block" style={{ pointerEvents: 'auto', display: 'flex', gap: '20px', borderLeft: 'none', background: 'rgba(3, 8, 20, 0.85)', padding: '40px', borderRadius: '4px' }} variants={itemVariants}>
           <a href="mailto:kiranlalk123@gmail.com" className="sys-btn">Email Connection</a>
           <a href="https://linkedin.com/in/kiranlalk" target="_blank" rel="noreferrer" className="sys-btn">LinkedIn Portal</a>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </Scroll>
   );
 }

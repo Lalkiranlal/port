@@ -51,18 +51,7 @@ export default function Loader({ onComplete }) {
         </div>
       </div>
 
-      {/* Loading Text */}
-      <motion.div 
-        animate={{ opacity: progress === 100 ? 0 : 1 }}
-        style={{ marginTop: '50px', textAlign: 'center' }}
-      >
-        <h2 style={{ fontFamily: 'var(--font-heading)', color: '#00f0ff', letterSpacing: '5px', margin: 0, textShadow: '0 0 10px #00f0ff' }}>
-          SYSTEM BOOT
-        </h2>
-        <h3 style={{ color: 'var(--color-text-main)', fontFamily: 'monospace', marginTop: '10px' }}>
-          {progress}%
-        </h3>
-      </motion.div>
+      {/* User requested ONLY the cube to be shown */}
     </motion.div>
   );
 }

@@ -30,6 +30,44 @@ body {
   font-size: 16px;
 }
 
+/* Cube Loading Animation */
+.cube-scene {
+  width: 100px;
+  height: 100px;
+  perspective: 400px;
+}
+
+.cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: rotateCube 4s infinite linear;
+}
+
+.cube-face {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.5);
+  opacity: 0.8;
+}
+
+.cube-face.front  { transform: rotateY(  0deg) translateZ(50px); }
+.cube-face.right  { transform: rotateY( 90deg) translateZ(50px); }
+.cube-face.back   { transform: rotateY(180deg) translateZ(50px); }
+.cube-face.left   { transform: rotateY(-90deg) translateZ(50px); }
+.cube-face.top    { transform: rotateX( 90deg) translateZ(50px); }
+.cube-face.bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+@keyframes rotateCube {
+  0% { transform: rotateX(0deg) rotateY(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
 h1,
 h2,
 h3,
@@ -281,29 +319,13 @@ section {
   box-shadow: 0 0 15px var(--color-sys-blue);
 }
 
-/* Accent Line for body content instead of boxes */
+/* Pure Shadow Floating Text instead of boxes */
 .system-content-block {
-  border-left: 2px solid rgba(0, 229, 255, 0.8);
-  padding-left: 30px;
   margin-bottom: 3rem;
   position: relative;
-  /* Massive dark fog to isolate text from glowing blue background */
-  background: linear-gradient(90deg, rgba(3, 8, 20, 0.95) 0%, rgba(3, 8, 20, 0.7) 40%, transparent 100%);
-  padding-top: 30px;
-  padding-bottom: 30px;
-  padding-right: 40px;
-  backdrop-filter: blur(8px);
-}
-
-.system-content-block::before {
-  content: '';
-  position: absolute;
-  left: -6px;
-  top: 0;
-  width: 10px;
-  height: 10px;
-  background: var(--color-sys-blue);
-  box-shadow: 0 0 10px var(--color-sys-blue);
+  /* Deep shadow to separate text from glowing background */
+  text-shadow: 0 5px 15px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 0, 0, 0.5);
+  padding: 10px 0;
 }
 
 /* Right-aligned modifiers */
@@ -316,17 +338,7 @@ section {
 }
 
 .system-content-block.right-align {
-  border-left: none;
-  border-right: 2px solid rgba(0, 229, 255, 0.8);
-  padding-left: 40px;
-  padding-right: 30px;
   text-align: right;
-  background: linear-gradient(-90deg, rgba(3, 8, 20, 0.95) 0%, rgba(3, 8, 20, 0.7) 40%, transparent 100%);
-}
-
-.system-content-block.right-align::before {
-  left: auto;
-  right: -6px;
 }
 
 /* Typography */
