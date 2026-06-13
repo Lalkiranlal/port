@@ -1,0 +1,356 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Oswald:wght@500;700&display=swap');
+
+:root {
+  /* Shadow Monarch / System Palette */
+  --color-bg: #030613;
+  --color-text-main: #b8c5e6;
+  --color-text-bright: #e2f1ff;
+  --color-sys-blue: #00e5ff;
+  --color-sys-purple: #8a2be2;
+  --color-mural-red: #ff3366;
+  
+  /* Mapped for backward compatibility */
+  --color-sunfire-orange: var(--color-sys-blue);
+
+  --font-heading: 'Cinzel Decorative', serif;
+  --font-body: 'Rajdhani', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  font-size: 16px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  color: var(--color-text-bright);
+}
+
+.canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.content-container {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+section {
+  min-height: 100vh;
+  padding: 100px 10vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* -------------------------------------
+   Sunfire Aura UI Elements
+-------------------------------------- */
+
+/* HUD Minimalist Typography Elements */
+.hud-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hud-title {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--color-sys-blue);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+}
+
+.hud-subtitle {
+  color: #00f0ff;
+  font-family: monospace;
+  font-size: 1.1rem;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+  margin: 0 0 0.5rem 0;
+  border-left: 2px solid currentColor;
+  padding-left: 10px;
+}
+
+.main-title {
+  font-size: 3.5rem;
+  border-left: none;
+  padding-left: 0;
+  background: linear-gradient(to bottom, #ffffff 30%, #5ce1e6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.8), 0 0 40px rgba(138, 43, 226, 0.6), 0 0 80px rgba(0, 229, 255, 0.4);
+  letter-spacing: 5px;
+}
+
+.hud-text {
+  color: var(--color-text-bright);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+.hud-list-item {
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 15px;
+}
+
+.hud-list-item::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: var(--color-sunfire-orange);
+  font-family: monospace;
+}
+
+/* Epic Headings */
+.deity-heading {
+  font-size: 5rem;
+  color: var(--color-text-bright);
+  text-shadow: 0 0 20px rgba(255, 145, 0, 0.4);
+  margin-bottom: 1rem;
+  line-height: 1.1;
+  letter-spacing: 2px;
+}
+
+.deity-sub {
+  font-family: var(--font-heading);
+  color: var(--color-mural-red);
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  display: inline-block;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--color-mural-red);
+  padding-bottom: 5px;
+}
+
+/* Sunfire Buttons */
+.shadow-btn {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-bg);
+  background: var(--color-sunfire-orange);
+  padding: 12px 28px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  letter-spacing: 1px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+.shadow-btn:hover {
+  background: var(--color-text-bright);
+  color: var(--color-bg);
+  box-shadow: 0 0 20px var(--color-sunfire-orange);
+}
+
+.shadow-btn.secondary {
+  background: transparent;
+  color: var(--color-sunfire-orange);
+  border: 1px solid var(--color-sunfire-orange);
+  clip-path: none;
+}
+
+.shadow-btn.secondary:hover {
+  background: rgba(255, 145, 0, 0.1);
+  box-shadow: 0 0 20px rgba(255, 145, 0, 0.3);
+}
+
+/* Parallel Axis Grid */
+.projects-parallax-container {
+  display: flex;
+  gap: 3rem;
+  margin-top: 3rem;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.parallax-column {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Dynamic Timeline */
+.timeline-container {
+  position: relative;
+  margin-top: 4rem;
+  padding-left: 4rem;
+  /* More space for the wide braid */
+}
+
+.timeline-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 40px;
+  /* Wider to accommodate the braid */
+}
+
+.exp-item-container {
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .deity-heading {
+    font-size: 3rem;
+  }
+
+  .projects-parallax-container {
+    flex-direction: column;
+  }
+}
+
+/* Solo Leveling System Window Theme */
+.system-window {
+  background: rgba(3, 8, 20, 0.95);
+  border: 1px solid var(--color-sys-blue);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3), inset 0 0 20px rgba(0, 229, 255, 0.1);
+  padding: 2.5rem;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.system-window::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(0, 229, 255, 0.15), transparent);
+  transform: skewX(-20deg);
+  animation: shine 6s infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+
+  20% {
+    left: 200%;
+  }
+
+  100% {
+    left: 200%;
+  }
+}
+
+/* Timeline Flow */
+.timeline-flow {
+  position: relative;
+  padding-left: 30px;
+  border-left: 2px solid #27c93f;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-left: 10px;
+}
+
+.timeline-node {
+  position: relative;
+}
+
+.timeline-node::before {
+  content: '';
+  position: absolute;
+  left: -37px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  background: #27c93f;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #27c93f;
+}
+
+/* 3D Cube Loader */
+.cube-scene {
+  width: 200px;
+  height: 200px;
+  perspective: 1000px;
+  margin: 0 auto;
+}
+
+.cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spinCube 10s infinite linear;
+}
+
+.cube-face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 2px solid #00f0ff;
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.6) inset, 0 0 10px rgba(0, 240, 255, 0.8);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  color: #fff;
+  font-size: 1.5rem;
+  text-shadow: 0 0 10px #00f0ff;
+}
+
+.cube-face.front  { transform: rotateY(  0deg) translateZ(100px); }
+.cube-face.right  { transform: rotateY( 90deg) translateZ(100px); }
+.cube-face.back   { transform: rotateY(180deg) translateZ(100px); }
+.cube-face.left   { transform: rotateY(-90deg) translateZ(100px); }
+.cube-face.top    { transform: rotateX( 90deg) translateZ(100px); }
+.cube-face.bottom { transform: rotateX(-90deg) translateZ(100px); }
+
+@keyframes spinCube {
+  0% { transform: rotateX(0deg) rotateY(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg); }
+}
