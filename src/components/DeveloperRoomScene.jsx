@@ -345,28 +345,33 @@ function NavListener() {
 function Overlays({ isMobile }) {
   const sections = [
     // Intro
-    { offset: 0.0, top: '50vh', width: isMobile ? '90vw' : '700px', left: isMobile ? '50%' : '10%', right: 'auto', align: isMobile ? 'center' : 'left', transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)' }, 
+    { offset: 0.0, align: isMobile ? 'center' : 'flex-start', textAlign: isMobile ? 'center' : 'left' }, 
     // Projects
-    { offset: 0.25, top: '325vh', width: isMobile ? '90vw' : '700px', left: isMobile ? '50%' : 'auto', right: isMobile ? 'auto' : '10%', align: isMobile ? 'center' : 'right', transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)' },
+    { offset: 0.25, align: isMobile ? 'center' : 'flex-end', textAlign: isMobile ? 'center' : 'right' },
     // Skills
-    { offset: 0.45, top: '545vh', width: isMobile ? '90vw' : '800px', left: '50%', right: 'auto', align: 'center', transform: 'translate(-50%, -50%)' }, 
+    { offset: 0.45, align: 'center', textAlign: 'center' }, 
     // Education
-    { offset: 0.65, top: '765vh', width: isMobile ? '90vw' : '700px', left: isMobile ? '50%' : '10%', right: 'auto', align: isMobile ? 'center' : 'left', transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)' }, 
+    { offset: 0.65, align: isMobile ? 'center' : 'flex-start', textAlign: isMobile ? 'center' : 'left' }, 
     // Experience
-    { offset: 0.80, top: '930vh', width: isMobile ? '90vw' : '700px', left: isMobile ? '50%' : 'auto', right: isMobile ? 'auto' : '10%', align: isMobile ? 'center' : 'right', transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)' }, 
+    { offset: 0.80, align: isMobile ? 'center' : 'flex-end', textAlign: isMobile ? 'center' : 'right' }, 
     // Contact
-    { offset: 0.92, top: '1062vh', width: isMobile ? '90vw' : '600px', left: '50%', right: 'auto', align: 'center', transform: 'translate(-50%, -50%)' }, 
+    { offset: 0.92, align: 'center', textAlign: 'center' }, 
   ];
 
   const getContainerStyle = (index) => ({
     position: 'absolute',
-    top: sections[index].top,
-    left: sections[index].left,
-    right: sections[index].right,
-    transform: sections[index].transform,
-    width: sections[index].width,
+    top: `${sections[index].offset * 1100}vh`, // Exact scroll position: offset * (pages - 1) * 100vh
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: sections[index].align,
+    padding: isMobile ? '0 5vw' : '0 10vw',
     zIndex: 10,
-    pointerEvents: 'none'
+    pointerEvents: 'none',
+    textAlign: sections[index].textAlign,
   });
 
   const variantsLeft = {
@@ -401,43 +406,47 @@ function Overlays({ isMobile }) {
     <Scroll html style={{ width: '100vw' }}>
       {/* 1. Intro (Left) */}
       <motion.div className="system-section" style={getContainerStyle(0)} variants={variantsLeft} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
-        <motion.h1 className="system-header" variants={itemVariants}><DecodeText text="Kiran Lal K" /></motion.h1>
-        <motion.div className="system-content-block" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
-          <h2 className="system-title"><DecodeText text="Flutter Developer" delay={100} /></h2>
-          <div className="system-subtitle"><DecodeText text="Class: Mobile Engineer | Lvl: 24" delay={200} /></div>
-          <p className="system-body">
-            With nearly 2 years of experience building scalable enterprise mobile applications. Experienced in developing cross-platform apps using Flutter, REST APIs, and Firebase. Strong background in offline-first architecture, B2B commerce platforms, and sales force automation tools.
-          </p>
-        </motion.div>
+        <div style={{ maxWidth: '700px' }}>
+          <motion.h1 className="system-header" variants={itemVariants}><DecodeText text="Kiran Lal K" /></motion.h1>
+          <motion.div className="system-content-block" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
+            <h2 className="system-title"><DecodeText text="Flutter Developer" delay={100} /></h2>
+            <div className="system-subtitle"><DecodeText text="Class: Mobile Engineer | Lvl: 24" delay={200} /></div>
+            <p className="system-body">
+              With nearly 2 years of experience building scalable enterprise mobile applications. Experienced in developing cross-platform apps using Flutter, REST APIs, and Firebase. Strong background in offline-first architecture, B2B commerce platforms, and sales force automation tools.
+            </p>
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* 2. Projects (Right) */}
       <motion.div className="system-section" style={getContainerStyle(1)} variants={variantsRight} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }}>
-        <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Active Quests" /></motion.h1>
+        <div style={{ maxWidth: '700px' }}>
+          <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Active Quests" /></motion.h1>
 
-        <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
-          <h2 className="system-title"><DecodeText text="Rapidor Enterprise Sales Platform" delay={100} /></h2>
-          <div className="system-subtitle"><DecodeText text="B2B Commerce & SFA" delay={200} /></div>
-          <p className="system-body">
-            Developed features for smart catalogue management, fast order creation, and price updates. Implemented offline order creation with AutoSync to synchronize orders when connectivity returns. Built modules for offer management, product performance tracking, and communication. Integrated ERP systems including SAP, Tally, and QuickBooks.
-          </p>
-        </motion.div>
+          <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
+            <h2 className="system-title"><DecodeText text="Rapidor Enterprise Sales Platform" delay={100} /></h2>
+            <div className="system-subtitle"><DecodeText text="B2B Commerce & SFA" delay={200} /></div>
+            <p className="system-body">
+              Developed features for smart catalogue management, fast order creation, and price updates. Implemented offline order creation with AutoSync to synchronize orders when connectivity returns. Built modules for offer management, product performance tracking, and communication. Integrated ERP systems including SAP, Tally, and QuickBooks.
+            </p>
+          </motion.div>
 
-        <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
-          <h2 className="system-title"><DecodeText text="PlaceOrder – B2B Marketplace" delay={100} /></h2>
-          <div className="system-subtitle"><DecodeText text="ONDC Integrated Platform" delay={200} /></div>
-          <p className="system-body">
-            Contributed to a B2B marketplace enabling businesses to buy and sell products digitally. Implemented product browsing, order placement, and backend API integrations.
-          </p>
-        </motion.div>
+          <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
+            <h2 className="system-title"><DecodeText text="PlaceOrder – B2B Marketplace" delay={100} /></h2>
+            <div className="system-subtitle"><DecodeText text="ONDC Integrated Platform" delay={200} /></div>
+            <p className="system-body">
+              Contributed to a B2B marketplace enabling businesses to buy and sell products digitally. Implemented product browsing, order placement, and backend API integrations.
+            </p>
+          </motion.div>
 
-        <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
-          <h2 className="system-title"><DecodeText text="Ezy Reports – Lifeex India" delay={100} /></h2>
-          <div className="system-subtitle"><DecodeText text="Medical Sales Reporter" delay={200} /></div>
-          <p className="system-body">
-            Developed reporting application for medical sales representatives. Implemented doctor visit tracking, order reports, and activity logging.
-          </p>
-        </motion.div>
+          <motion.div className="system-content-block right-align" style={{ pointerEvents: 'auto' }} variants={itemVariants}>
+            <h2 className="system-title"><DecodeText text="Ezy Reports – Lifeex India" delay={100} /></h2>
+            <div className="system-subtitle"><DecodeText text="Medical Sales Reporter" delay={200} /></div>
+            <p className="system-body">
+              Developed reporting application for medical sales representatives. Implemented doctor visit tracking, order reports, and activity logging.
+            </p>
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* 3. Skills (Center) */}
@@ -475,36 +484,40 @@ function Overlays({ isMobile }) {
 
       {/* 4. Education (Left) */}
       <motion.div className="system-section" style={getContainerStyle(3)} variants={variantsLeft} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
-        <motion.h1 className="system-header" variants={itemVariants}><DecodeText text="Origins" /></motion.h1>
-        <ConstellationTimeline
-          nodes={[
-            { label: "10th Standard", sub: "VMHSS School, Palakkad" },
-            { label: "Higher Secondary", sub: "GBHSS, Palakkad" },
-            { label: "Bachelor's in CS", sub: "University of Calicut | 2019-2021" },
-            { label: "Master's in Mobile Dev", sub: "CUSAT | 2022-2024" }
-          ]}
-          pathData={isMobile ? "M 10 10 L 20 40 L 10 65 L 20 95" : "M 30 10 L 10 40 L 50 65 L 70 95"}
-          starCoords={isMobile 
-            ? [{ x: 10, y: 10 }, { x: 20, y: 40 }, { x: 10, y: 65 }, { x: 20, y: 95 }]
-            : [{ x: 30, y: 10 }, { x: 10, y: 40 }, { x: 50, y: 65 }, { x: 70, y: 95 }]}
-          height={isMobile ? "400px" : "600px"}
-        />
+        <div style={{ maxWidth: '700px', width: '100%' }}>
+          <motion.h1 className="system-header" variants={itemVariants}><DecodeText text="Origins" /></motion.h1>
+          <ConstellationTimeline
+            nodes={[
+              { label: "10th Standard", sub: "VMHSS School, Palakkad" },
+              { label: "Higher Secondary", sub: "GBHSS, Palakkad" },
+              { label: "Bachelor's in CS", sub: "University of Calicut | 2019-2021" },
+              { label: "Master's in Mobile Dev", sub: "CUSAT | 2022-2024" }
+            ]}
+            pathData={isMobile ? "M 10 10 L 20 40 L 10 65 L 20 95" : "M 30 10 L 10 40 L 50 65 L 70 95"}
+            starCoords={isMobile 
+              ? [{ x: 10, y: 10 }, { x: 20, y: 40 }, { x: 10, y: 65 }, { x: 20, y: 95 }]
+              : [{ x: 30, y: 10 }, { x: 10, y: 40 }, { x: 50, y: 65 }, { x: 70, y: 95 }]}
+            height={isMobile ? "400px" : "600px"}
+          />
+        </div>
       </motion.div>
 
       {/* 5. Experience (Right) */}
       <motion.div className="system-section" style={getContainerStyle(4)} variants={variantsRight} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }}>
-        <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Guild History" /></motion.h1>
-        <ConstellationTimeline
-          nodes={[
-            { label: "Freelance Flutter Dev", sub: "Upwork | June 2024 – Present\nDesigned and shipped full-stack mobile applications with Firebase integration." },
-            { label: "Software Developer Intern", sub: "AcelrTech | Mar 2024 – May 2024\nContributed to production Flutter applications used by enterprise sales teams.\nResolved 200+ issues related to UI rendering, API integration, and mobile builds." }
-          ]}
-          pathData={isMobile ? "M 15 20 L 25 80" : "M 80 20 L 20 80"}
-          starCoords={isMobile 
-            ? [{ x: 15, y: 20 }, { x: 25, y: 80 }]
-            : [{ x: 80, y: 20 }, { x: 20, y: 80 }]}
-          height={isMobile ? "300px" : "500px"}
-        />
+        <div style={{ maxWidth: '700px', width: '100%' }}>
+          <motion.h1 className="system-header right-align" style={{ alignSelf: 'flex-end' }} variants={itemVariants}><DecodeText text="Guild History" /></motion.h1>
+          <ConstellationTimeline
+            nodes={[
+              { label: "Freelance Flutter Dev", sub: "Upwork | June 2024 – Present\nDesigned and shipped full-stack mobile applications with Firebase integration." },
+              { label: "Software Developer Intern", sub: "AcelrTech | Mar 2024 – May 2024\nContributed to production Flutter applications used by enterprise sales teams.\nResolved 200+ issues related to UI rendering, API integration, and mobile builds." }
+            ]}
+            pathData={isMobile ? "M 15 20 L 25 80" : "M 80 20 L 20 80"}
+            starCoords={isMobile 
+              ? [{ x: 15, y: 20 }, { x: 25, y: 80 }]
+              : [{ x: 80, y: 20 }, { x: 20, y: 80 }]}
+            height={isMobile ? "300px" : "500px"}
+          />
+        </div>
       </motion.div>
 
       {/* 6. Contact (Center) */}
