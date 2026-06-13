@@ -173,7 +173,7 @@ function App() {
       <div style={{ width: '100vw', height: '100vh', background: '#020202', overflow: 'hidden', position: 'relative' }}>
         {!loading && <VerticalNavigation isMobile={isMobile} />}
         <Canvas
-          camera={{ position: [0, 10, 40], fov: isMobile ? 105 : 60 }}
+          camera={{ position: [0, 10, 40], fov: isMobile ? 105 : 95 }}
           gl={{ powerPreference: "high-performance", antialias: false }} // postprocessing handles AA
         >
           {/* We only render the 3D scene when loading is complete so animations sync properly */}
